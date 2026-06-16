@@ -23,12 +23,14 @@ const pool = mysql.createPool({
 // Test Database Connection
 pool.getConnection((err, connection) => {
   if (err) {
-    console.error("Database Connection Failed:");
-    console.error(err);
+    console.log("ERROR CODE:", err.code);
+    console.log("ERROR NUMBER:", err.errno);
+    console.log("ERROR MESSAGE:", err.message);
+    console.log(err);
     return;
   }
 
-  console.log("✅ MySQL Connected Successfully");
+  console.log("MYSQL CONNECTED");
   connection.release();
 });
 

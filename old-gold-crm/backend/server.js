@@ -1,6 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
+const net = require("net");
+
+const socket = new net.Socket();
 
 const app = express();
 
@@ -14,6 +17,22 @@ const reportStatusRoutes = require("./routes/reportStatusRoutes");
 const followupRoutes = require("./routes/followupRoutes");
 
 require("./config/db");
+
+socket.setTimeout(10000);
+
+socket.connect(3306, "82.25.121.136", () => {
+  console.log("PORT 3306 REACHABLE");
+  socket.destroy();
+});
+
+socket.on("timeout", () => {
+  console.log("PORT 3306 TIMEOUT");
+  socket.destroy();
+});
+
+socket.on("error", (err) => {
+  console.log("PORT TEST ERROR:", err.message);
+});
 
 // app.use(cors());
 

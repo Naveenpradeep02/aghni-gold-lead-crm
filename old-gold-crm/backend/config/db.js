@@ -21,6 +21,7 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 // Test Database Connection
+
 pool.getConnection((err, connection) => {
   if (err) {
     console.log("ERROR CODE:", err.code);

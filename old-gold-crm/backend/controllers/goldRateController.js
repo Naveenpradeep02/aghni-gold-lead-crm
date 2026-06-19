@@ -49,3 +49,25 @@ exports.updateRate = async (req, res) => {
     });
   }
 };
+exports.getPublicRates = async (req, res) => {
+  try {
+    const [rates] = await db.query(`
+      SELECT
+        gold_type,
+        new_rate,
+        old_rate,
+        updated_at
+      FROM gold_rates
+    `);
+
+    res.json({
+      success: true,
+      data: rates,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

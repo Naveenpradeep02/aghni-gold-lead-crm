@@ -76,8 +76,28 @@ exports.createLead = async (req, res) => {
       ornament_type,
       bank_finance_name,
       pledged_amount,
+
+      // New Fields
+      lead_source_id,
+      landing_page,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_content,
+      utm_term,
     } = req.body;
 
+    // Auto Capture
+    const ip_address =
+      req.headers["x-forwarded-for"]?.split(",")[0] ||
+      req.socket.remoteAddress ||
+      req.ip;
+
+    const user_agent = req.headers["user-agent"] || null;
+
+    const referrer = req.headers["referer"] || req.headers["referrer"] || null;
+
+    // Get Gold Rate
     const [rates] = await db.query(
       "SELECT * FROM gold_rates WHERE gold_type = ?",
       [gold_type],
@@ -95,6 +115,7 @@ exports.createLead = async (req, res) => {
     const market_value = Number(weight) * Number(rate.new_rate);
     const purchase_value = Number(weight) * Number(rate.old_rate);
 
+    // Insert Lead
     const [result] = await db.query(
       `INSERT INTO leads (
         customer_name,
@@ -108,9 +129,20 @@ exports.createLead = async (req, res) => {
         gold_location,
         ornament_type,
         bank_finance_name,
-        pledged_amount
+        pledged_amount,
+
+        lead_source_id,
+        landing_page,
+        ip_address,
+        user_agent,
+        referrer,
+        utm_source,
+        utm_medium,
+        utm_campaign,
+        utm_content,
+        utm_term
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         customer_name,
         mobile,
@@ -124,17 +156,29 @@ exports.createLead = async (req, res) => {
         ornament_type,
         bank_finance_name,
         pledged_amount || 0,
+
+        lead_source_id || null,
+        landing_page || null,
+        ip_address,
+        user_agent,
+        referrer,
+        utm_source || null,
+        utm_medium || null,
+        utm_campaign || null,
+        utm_content || null,
+        utm_term || null,
       ],
     );
 
     res.status(201).json({
       success: true,
+      message: "Lead created successfully",
       leadId: result.insertId,
       market_value,
       purchase_value,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     res.status(500).json({
       success: false,

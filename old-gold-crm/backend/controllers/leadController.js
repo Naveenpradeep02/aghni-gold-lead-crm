@@ -70,6 +70,7 @@ exports.createLead = async (req, res) => {
       mobile,
       email,
       city,
+      pincode,
       gold_type,
       weight,
       gold_location,

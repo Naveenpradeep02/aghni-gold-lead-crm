@@ -210,12 +210,18 @@ exports.updateLeadStatus = async (req, res) => {
     const { status } = req.body;
 
     const validStatus = [
-      "new",
-      "contacted",
-      "scheduled",
-      "converted",
-      "purchased",
-      "rejected",
+      "Potential",
+      "Enquiry",
+      "Call Back",
+      "Hindi Person",
+      "Sales Done With Us",
+      "Out Of Station",
+      "Not Interested",
+      "Genuine Reject",
+      "Fraud Reject",
+      "New",
+      "Contacted",
+      "Sales Done With Others",
     ];
 
     if (!validStatus.includes(status)) {

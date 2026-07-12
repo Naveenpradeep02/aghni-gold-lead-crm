@@ -34,7 +34,6 @@ exports.dailyMatrixReport = async (req, res) => {
     });
   }
 };
-const db = require("../config/db");
 
 exports.getReportStatuses = async (req, res) => {
   try {

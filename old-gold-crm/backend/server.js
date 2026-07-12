@@ -15,6 +15,7 @@ const reportRoutes = require("./routes/reportRoutes");
 const sourceRoutes = require("./routes/sourceRoutes");
 const reportStatusRoutes = require("./routes/reportStatusRoutes");
 const followupRoutes = require("./routes/followupRoutes");
+const leadSourceRoutes = require("./routes/leadSourceRoutes");
 
 require("./config/db");
 
@@ -55,6 +56,7 @@ app.use("/api/reports", reportRoutes);
 app.use("/api/sources", sourceRoutes);
 app.use("/api/report-statuses", reportStatusRoutes);
 app.use("/api/follow-ups", followupRoutes);
+app.use("/api/lead-sources", leadSourceRoutes);
 
 const PORT = process.env.PORT || 5000;
 

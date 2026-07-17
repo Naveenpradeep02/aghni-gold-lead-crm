@@ -222,6 +222,7 @@ exports.updateLeadStatus = async (req, res) => {
       "New",
       "Contacted",
       "Sales Done With Others",
+      "Not Tally",
     ];
 
     if (!validStatus.includes(status)) {

@@ -62,7 +62,42 @@ const db = require("../config/db");
 //     });
 //   }
 // };
+async function getLeadSourceId(data) {
+  let sourceName = "Website";
+  const utmSource = (data.utm_source || "").toLowerCase();
 
+  if (data.gclid || data.gbraid || data.wbraid) {
+    sourceName = "Google Ads";
+  } else if (data.msclkid) {
+    sourceName = "Microsoft Ads";
+  } else if (data.fbclid) {
+    if ((data.utm_source || "").toLowerCase() === "instagram") {
+      sourceName = "Instagram Ads";
+    } else {
+      sourceName = "Facebook Ads";
+    }
+  } else if (utmSource.includes("google")) {
+    sourceName = "Organic Search";
+  } else if ((data.utm_source || "").toLowerCase() === "whatsapp") {
+    sourceName = "WhatsApp";
+  } else if ((data.utm_source || "").toLowerCase() === "youtube") {
+    sourceName = "YouTube Ads";
+  } else if ((data.utm_source || "").toLowerCase() === "linkedin") {
+    sourceName = "LinkedIn Ads";
+  } else if ((data.utm_source || "").toLowerCase() === "referral") {
+    sourceName = "Referral";
+  }
+
+  const [rows] = await db.query(
+    "SELECT id FROM lead_sources WHERE source_name=? LIMIT 1",
+    [sourceName],
+  );
+
+  return {
+    id: rows.length ? rows[0].id : 1,
+    name: sourceName,
+  };
+}
 exports.createLead = async (req, res) => {
   try {
     const {
@@ -77,9 +112,20 @@ exports.createLead = async (req, res) => {
       ornament_type,
       bank_finance_name,
       pledged_amount,
-
-      // New Fields
-      lead_source_id,
+      platform,
+      campaign_id,
+      campaign_name,
+      adset_id,
+      adset_name,
+      adgroup_id,
+      adgroup_name,
+      ad_id,
+      ad_name,
+      gclid,
+      fbclid,
+      msclkid,
+      device,
+      network,
       landing_page,
       utm_source,
       utm_medium,
@@ -97,7 +143,7 @@ exports.createLead = async (req, res) => {
     const user_agent = req.headers["user-agent"] || null;
 
     const referrer = req.headers["referer"] || req.headers["referrer"] || null;
-
+    const leadSource = await getLeadSourceId(req.body);
     // Get Gold Rate
     const [rates] = await db.query(
       "SELECT * FROM gold_rates WHERE gold_type = ?",
@@ -133,6 +179,20 @@ exports.createLead = async (req, res) => {
     bank_finance_name,
     pledged_amount,
     lead_source_id,
+    platform,
+    campaign_id,
+    campaign_name,
+    adset_id,
+    adset_name,
+    adgroup_id,
+    adgroup_name,
+    ad_id,
+    ad_name,
+    gclid,
+    fbclid,
+    msclkid,
+    device,
+    network,
     landing_page,
     ip_address,
     user_agent,
@@ -143,7 +203,9 @@ exports.createLead = async (req, res) => {
     utm_content,
     utm_term
   )
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+ VALUES (
+ ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+)`,
       [
         customer_name,
         mobile,
@@ -158,7 +220,21 @@ exports.createLead = async (req, res) => {
         ornament_type,
         bank_finance_name,
         pledged_amount || 0,
-        lead_source_id || null,
+        leadSource.id,
+        platform || null,
+        campaign_id || null,
+        campaign_name || null,
+        adset_id || null,
+        adset_name || null,
+        adgroup_id || null,
+        adgroup_name || null,
+        ad_id || null,
+        ad_name || null,
+        gclid || null,
+        fbclid || null,
+        msclkid || null,
+        device || null,
+        network || null,
         landing_page || null,
         ip_address,
         user_agent,
